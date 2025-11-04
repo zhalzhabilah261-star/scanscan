@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pemindai QR/AR</title>
+    <title>Akses Kamera Langsung & Pemindai</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body {
@@ -13,68 +13,83 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f4f4f9;
+            background-color: #f0f0f0;
             margin: 0;
             text-align: center;
         }
-        #reader {
+
+        #reader-container {
             width: 90%;
             max-width: 500px;
-            border: 2px solid #007bff;
+            padding: 20px;
+            background-color: white;
             border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Bayangan lebih jelas */
         }
-        #result-link {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            display: none; /* Sembunyikan sampai hasil ditemukan */
-            margin-top: 15px;
-        }
+
         h2 {
+            color: #1e88e5; /* Warna biru */
+            margin-bottom: 15px;
+        }
+
+        #reader {
+            width: 100%;
+            border: 3px solid #1e88e5; /* Border biru lebih tebal */
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6ffe6;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            display: none; /* Sembunyikan hasil awal */
+            font-weight: bold;
             color: #333;
+        }
+
+        #decoded-text {
+            color: #007bff;
+            word-break: break-all; /* Memastikan teks panjang tidak merusak layout */
         }
     </style>
 </head>
 <body>
-    <h2>Arahkan Kamera ke Kode QR/AR</h2>
-    <div id="reader"></div>
-    <a id="result-link" target="_blank">Buka Tautan</a>
+    <div id="reader-container">
+        <h2>Akses Kamera & Siap Memindai QR 📸</h2>
+        <p>Mohon berikan izin kamera pada browser Anda.</p>
+        <div id="reader"></div>
+        <div id="result">Hasil Pemindaian: <span id="decoded-text"></span></div>
+    </div>
 
     <script>
-        function onScanSuccess(decodedText, decodedResult) {
-            // Ketika Kode QR berhasil dipindai
-            console.log(`Kode dipindai: ${decodedText}`, decodedResult);
-            
-            // Hentikan pemindaian setelah berhasil
-            html5QrcodeScanner.clear();
+        const cameraId = "reader";
 
-            // Tampilkan tautan hasil
-            const resultLink = document.getElementById('result-link');
-            resultLink.href = decodedText;
-            resultLink.style.display = 'inline-block';
-            resultLink.textContent = "Kode Ditemukan! Klik untuk Buka";
-            
-            // Opsional: Langsung buka tautan
-            // window.open(decodedText, '_blank');
+        function onScanSuccess(decodedText, decodedResult) {
+            // Ketika kode berhasil dipindai
+            document.getElementById('decoded-text').textContent = decodedText;
+            document.getElementById('result').style.display = 'block';
+            console.log(Code matched = ${decodedText});
         }
 
         function onScanError(errorMessage) {
-            // Tangani kesalahan pemindaian (biasanya hanya error debug)
-            // console.warn(Kesalahan pemindaian: ${errorMessage});
+            // Error ditangani secara internal oleh library
         }
 
+        // Inisialisasi objek Html5QrcodeScanner
         const html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { 
-                fps: 10, 
-                qrbox: {width: 250, height: 250} 
+            cameraId, 
+            { 
+                fps: 10,                 
+                qrbox: {width: 250, height: 250}, 
+                rememberLastUsedCamera: true     
             },
-            /* Verbose= */ false);
-        
-        // Mulai pemindai
+            /* verbose= */ false
+        );
+
+        // Memulai pemindaian dan meminta izin kamera
         html5QrcodeScanner.render(onScanSuccess, onScanError);
     </script>
 </body>
