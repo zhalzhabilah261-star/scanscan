@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemindai QR/AR</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+            text-align: center;
+        }
+        #reader {
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        #result-link {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            display: none; /* Sembunyikan sampai hasil ditemukan */
+            margin-top: 15px;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h2>Arahkan Kamera ke Kode QR/AR</h2>
+    <div id="reader"></div>
+    <a id="result-link" target="_blank">Buka Tautan</a>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            // Ketika Kode QR berhasil dipindai
+            console.log(`Kode dipindai: ${decodedText}`, decodedResult);
+            
+            // Hentikan pemindaian setelah berhasil
+            html5QrcodeScanner.clear();
+
+            // Tampilkan tautan hasil
+            const resultLink = document.getElementById('result-link');
+            resultLink.href = decodedText;
+            resultLink.style.display = 'inline-block';
+            resultLink.textContent = "Kode Ditemukan! Klik untuk Buka";
+            
+            // Opsional: Langsung buka tautan
+            // window.open(decodedText, '_blank');
+        }
+
+        function onScanError(errorMessage) {
+            // Tangani kesalahan pemindaian (biasanya hanya error debug)
+            // console.warn(Kesalahan pemindaian: ${errorMessage});
+        }
+
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { 
+                fps: 10, 
+                qrbox: {width: 250, height: 250} 
+            },
+            /* Verbose= */ false);
+        
+        // Mulai pemindai
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
+    </script>
+</body>
+</html>
